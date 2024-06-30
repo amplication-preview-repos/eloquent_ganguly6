@@ -1,0 +1,76 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model EnergyConsumption {
+  building         Building? @relation(fields: [buildingId], references: [id])
+  buildingId       String?
+  createdAt        DateTime  @default(now())
+  date             DateTime?
+  electricityUsage Float?
+  gasUsage         Float?
+  id               String    @id @default(cuid())
+  updatedAt        DateTime  @updatedAt
+  waterUsage       Float?
+}
+
+model Building {
+  address            String?
+  builtYear          Int?
+  createdAt          DateTime            @default(now())
+  energyConsumptions EnergyConsumption[]
+  hvacSystems        HvacSystem[]
+  id                 String              @id @default(cuid())
+  name               String?
+  recommendations    Recommendation[]
+  totalFloors        Int?
+  updatedAt          DateTime            @updatedAt
+}
+
+model Recommendation {
+  building           Building?                   @relation(fields: [buildingId], references: [id])
+  buildingId         String?
+  createdAt          DateTime                    @default(now())
+  dateRecommended    DateTime?
+  id                 String                      @id @default(cuid())
+  implemented        Boolean?
+  priority           EnumRecommendationPriority?
+  recommendationText String?
+  updatedAt          DateTime                    @updatedAt
+}
+
+model HvacSystem {
+  building        Building?             @relation(fields: [buildingId], references: [id])
+  buildingId      String?
+  createdAt       DateTime              @default(now())
+  id              String                @id @default(cuid())
+  maintenanceDate DateTime?
+  status          EnumHvacSystemStatus?
+  typeField       String?
+  updatedAt       DateTime              @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+enum EnumRecommendationPriority {
+  Option1
+}
+
+enum EnumHvacSystemStatus {
+  Option1
+}
